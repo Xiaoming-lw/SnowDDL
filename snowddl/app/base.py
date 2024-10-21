@@ -347,6 +347,7 @@ class BaseApp:
 
     def init_config(self):
         config = SnowDDLConfig(self.env_prefix)
+        config.config_path = self.config_path
 
         # Placeholders
         placeholder_path = self.get_placeholder_path()
