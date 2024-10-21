@@ -1,5 +1,5 @@
 from argparse import ArgumentParser, HelpFormatter
-from os import environ, getcwd
+from os import environ, getcwd, path
 from pydantic import BaseModel
 from typing import Optional
 
@@ -44,6 +44,14 @@ class SingleDbApp(BaseApp):
             help="Path to config directory OR name of bundled test config (default: current directory)",
             metavar="CONFIG_PATH",
             default=getcwd(),
+        )
+
+        # Custom filters
+        parser.add_argument(
+            "-f",
+            help="Path to filter directory (default: `_filters` in current directory)",
+            metavar="FILTER_PATH",
+            default=path.join(getcwd(), "_filters"),
         )
 
         # Auth

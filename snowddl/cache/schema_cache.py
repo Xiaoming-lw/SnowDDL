@@ -1,4 +1,6 @@
 from typing import TYPE_CHECKING
+import os
+from pathlib import Path
 from importlib.util import module_from_spec, spec_from_file_location
 
 from snowddl.blueprint import Ident
@@ -21,15 +23,17 @@ class SchemaCache:
         self.reload()
 
     def load_filter(self):
-        for module_path in sorted(self.engine.config.config_path.parent.glob("filter/*.py")):
+        for module_path in sorted(Path(self.engine.config.filter_path).glob("*.py")):
             try:
                 spec = spec_from_file_location(module_path.name, module_path)
                 module = module_from_spec(spec)
                 spec.loader.exec_module(module)
 
                 if hasattr(module, "db_filter"):
+                    self.engine.logger.info("Load db_filter from file: " + module_path.name)
                     self.db_filter.append(module.db_filter)
                 if hasattr(module, "schema_filter"):
+                    self.engine.logger.info("Load schema_filter from file: " + module_path.name)
                     self.schema_filter.append(module.schema_filter)
             except Exception as e:
                 raise RuntimeError("Load custom filter files failed.") from e

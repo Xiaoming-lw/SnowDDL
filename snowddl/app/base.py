@@ -5,7 +5,7 @@ from importlib.util import module_from_spec, spec_from_file_location
 from json import loads as json_loads
 from json.decoder import JSONDecodeError
 from logging import getLogger, Formatter, StreamHandler
-from os import environ, getcwd
+from os import environ, getcwd, path
 from pathlib import Path
 from snowflake.connector import connect
 from string import ascii_uppercase, digits
@@ -58,6 +58,14 @@ class BaseApp:
             help="Path to config directory OR name of bundled test config (default: current directory)",
             metavar="CONFIG_PATH",
             default=getcwd(),
+        )
+
+        # Custom filters
+        parser.add_argument(
+            "-f",
+            help="Path to filter directory (default: `_filters` in current directory)",
+            metavar="FILTER_PATH",
+            default=path.join(getcwd(), "_filters"),
         )
 
         # Auth
@@ -347,7 +355,7 @@ class BaseApp:
 
     def init_config(self):
         config = SnowDDLConfig(self.env_prefix)
-        config.config_path = self.config_path
+        config.filter_path = Path(self.args["f"]).resolve()
 
         # Placeholders
         placeholder_path = self.get_placeholder_path()

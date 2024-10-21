@@ -1,5 +1,5 @@
 from argparse import ArgumentParser, HelpFormatter
-from os import environ, getcwd
+from os import environ, getcwd, path
 from pathlib import Path
 from shutil import rmtree
 
@@ -23,6 +23,14 @@ class ConvertApp(BaseApp):
         # Config
         parser.add_argument(
             "-c", help="Path to output config directory (default: current directory)", metavar="CONFIG_PATH", default=getcwd()
+        )
+
+        # Custom filters
+        parser.add_argument(
+            "-f",
+            help="Path to filter directory (default: `_filters` in current directory)",
+            metavar="FILTER_PATH",
+            default=path.join(getcwd(), "_filters"),
         )
 
         # Auth
@@ -142,7 +150,9 @@ class ConvertApp(BaseApp):
         return config_path
 
     def init_config(self):
-        return SnowDDLConfig(self.env_prefix)
+        config = SnowDDLConfig(self.env_prefix)
+        config.filter_path = Path(self.args["f"]).resolve()
+        return config
 
     def init_settings(self):
         settings = SnowDDLSettings()
